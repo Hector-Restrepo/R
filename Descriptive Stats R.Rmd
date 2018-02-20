@@ -1,0 +1,106 @@
+---
+title: "R Notebook"
+author: "Hector Restrepo"
+output: html_notebook
+---
+
+# NYU - Tandon School of Engineering
+# Business Analytics
+
+Notebook for exploring descriptive statistics in R
+
+#Business Questions:
+
+What is the total revenue assuming all users riding bikes from 0 to 45 minutes pay $3 per ride and user exceeding 45 minutes pay an additional $2 per ride.
+
+Looking at tripduration in minutes, what can you say about the variance in the data.  
+
+What does this mean for the pricing strategy?
+
+What does this mean for inventory availability?
+
+A business manager wants to reallocate the $5M marketing budget using a gender segmentation strategy.  Specifically, the manager is asking you to create two models: 
+
+A model that use % of male vs females in the dataset
+
+A  model based on average trip duration by gender
+
+### Load Information
+Information from the CitiBike rides provided by the course
+
+```{r}
+url="https://raw.githubusercontent.com/jcbonilla/BusinessAnalytics/master/BAData/CitiBike%20Data.csv"
+
+data = read.csv(url,header=TRUE)
+```
+### Analytics Questions
+
+Explore the data by trip duration, age of the users and find the correlation between the trip duration in minutes and the age of the users
+
+```{r}
+
+summary(data$tripduration) #Statistics 
+
+summary(data$birth.year)
+
+age=2017-data$birth.year
+
+summary(age)
+
+data$tripduration = data$tripduration / 60
+
+summary(data$tripduration)
+
+cor(age,data$tripduration)
+
+```
+### Plots
+
+Compare the trip duration by gender
+
+```{r}
+men = subset(data,gender==1)
+women = subset(data,gender==2)
+
+hist(men$tripduration,col="blue", main = "Trip Duration (Men in blue)")
+
+hist(women$tripduration,col="red",add=TRUE)
+
+boxplot(men$tripduration,horizontal=TRUE,col="blue",xlab="Trip duration - Men")
+
+boxplot(women$tripduration,horizontal=TRUE,col="red", xlab="Trip duration- Women")
+```
+### Revenue
+
+Define the revenue model to solve the question of resources allocation
+```{r}
+
+excess = subset(data,tripduration > 45)
+
+revenue = 3 * dim(data)[1] + 2 * dim(excess)[1]
+
+print(revenue)
+
+print('Variance and Standard Deviation:')
+
+var(data$tripduration)
+
+sd(data$tripduration)
+
+```
+
+### Model
+
+Allocation of the resources by 
+
+```{r}
+
+table(data$gender)*100/dim(data)[1]
+
+```
+
+#Conclusions
+
+There is a high variance in the duration of the trips, 196; this due to some outliers with high duration. Most of the trips are in the time window of 45 min (two standard deviations from the mean). For the pricing strategy, as there are some extream outliers, a higher punishment should be evaluated. As for the inventory, one should expect, on average it would keep constant. 
+
+Based on the percentage of males vs. females, 76% of the resources should be allocated targeting men. On average, women trips last longer; therefore, men trips are more profitable as they lead to higher inventory rotation.
